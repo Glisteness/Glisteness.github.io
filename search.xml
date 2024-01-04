@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>Unity-WebGL接入实时视频流</title>
+      <link href="/2024/01/02/Unity-WebGL%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%97%B6%E8%A7%86%E9%A2%91%E6%B5%81/"/>
+      <url>/2024/01/02/Unity-WebGL%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%97%B6%E8%A7%86%E9%A2%91%E6%B5%81/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity踩坑日记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Unity </tag>
+            
+            <tag> 技术 </tag>
+            
+            <tag> Unity-WebGL </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Unity WebGL中的跨域问题</title>
+      <link href="/2023/12/08/Unity-WebGL%E4%B8%AD%E7%9A%84%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/"/>
+      <url>/2023/12/08/Unity-WebGL%E4%B8%AD%E7%9A%84%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/</url>
+      
+        <content type="html"><![CDATA[<p>稍等编辑~</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity进阶 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Unity </tag>
+            
+            <tag> WebGL </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>UniTask替换协程IEnumerator-01</title>
+      <link href="/2023/12/03/UniTask%E6%9B%BF%E6%8D%A2%E5%8D%8F%E7%A8%8BIEnumerator-01/"/>
+      <url>/2023/12/03/UniTask%E6%9B%BF%E6%8D%A2%E5%8D%8F%E7%A8%8BIEnumerator-01/</url>
+      
+        <content type="html"><![CDATA[<p>使用UniTask替换协程函数的要点是，一个IEnumerator函数对应一个async方法，不可多！本质上是async替换了IEnumerator。</p><p>例如我们需要把下面的协程改为UniTask</p><pre><code>    private IEnumerator Test1()    &#123;        yield return new WaitForSeconds(5);        Debug.Log(&quot;IEnumerator WaitForSeconds 5&quot;);    &#125;</code></pre><p>可以改为</p><pre><code>    public async UniTask Test2()    &#123;        await UniTask.WaitForSeconds(5);        Debug.Log(&quot;UniTask WaitForSeconds 5&quot;);    &#125;    </code></pre><p>使用时注意，使用 _ &#x3D; Test2()，不可用 await Test2();</p><pre><code>    private void Start()    &#123;        _ = Test2();        Debug.Log(&quot;after WaitForSeconds 5&quot;);    &#125;</code></pre><p>否则Start方法也会被添加async关键字，标记成异步方法</p><pre><code>    private async void Start()    &#123;        await Test2();        Debug.Log(&quot;after WaitForSeconds 5&quot;);    &#125;</code></pre><p>两种输出是截然不同的<br><img src="/2023/12/03/UniTask%E6%9B%BF%E6%8D%A2%E5%8D%8F%E7%A8%8BIEnumerator-01/1.png"><br><img src="/2023/12/03/UniTask%E6%9B%BF%E6%8D%A2%E5%8D%8F%E7%A8%8BIEnumerator-01/2.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity进阶 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Unity </tag>
+            
+            <tag> UniTask </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>UniTask替换协程IEnumerator-02</title>
+      <link href="/2023/12/03/UniTask%E6%9B%BF%E6%8D%A2%E5%8D%8F%E7%A8%8BIEnumerator-02/"/>
+      <url>/2023/12/03/UniTask%E6%9B%BF%E6%8D%A2%E5%8D%8F%E7%A8%8BIEnumerator-02/</url>
+      
+        <content type="html"><![CDATA[<p>上次写到使用UniTask来替换协程IEnumerator，后来想了下协程函数通常是无返回值的，也就是void，那我不需要返回值的时候是不是可以直接用void标记呢？答案是可以。</p><pre><code>    private IEnumerator Test1()    &#123;        yield return new WaitForSeconds(5);        Debug.Log(&quot;IEnumerator WaitForSeconds 5&quot;);    &#125;    public async void Test2()    &#123;        await UniTask.WaitForSeconds(5);        Debug.Log(&quot;UniTask WaitForSeconds 5&quot;);    &#125;</code></pre><p>如图所示，在Test2()中使用async搭配void，即可实现Test1()中的等待效果</p><pre><code>    private void Start()    &#123;        //StartCoroutine(Test1());        Test2();        Debug.Log(&quot;after WaitForSeconds 5&quot;);    &#125;    private IEnumerator Test1()    &#123;        yield return new WaitForSeconds(5);        Debug.Log(&quot;IEnumerator WaitForSeconds 5&quot;);    &#125;    public async void Test2()    &#123;        await UniTask.WaitForSeconds(5);        Debug.Log(&quot;UniTask WaitForSeconds 5&quot;);    &#125;</code></pre><p>那么在使用时，可以直接调用方法，不再依赖MonoBehaviour中的StartCoroutine接口，更加便捷。</p><p>值得注意的是，await必须搭配通过调用另一个异步方法返回的任务。</p><p>参考资料：</p><p><a href="https://learn.microsoft.com/zh-cn/dotnet/csharp/asynchronous-programming/task-asynchronous-programming-model">使用 Async 和 Await 的任务异步编程 (TAP) 模型 | Microsoft Learn</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity进阶 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Unity </tag>
+            
+            <tag> UniTask </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Canvas设置为WorldSpace时，UI事件中鼠标位置信息偏移的问题</title>
+      <link href="/2023/12/03/Canvas%E8%AE%BE%E7%BD%AE%E4%B8%BAWorldSpace%E6%97%B6%EF%BC%8CUI%E4%BA%8B%E4%BB%B6%E4%B8%AD%E9%BC%A0%E6%A0%87%E4%BD%8D%E7%BD%AE%E4%BF%A1%E6%81%AF%E5%81%8F%E7%A7%BB%E7%9A%84%E9%97%AE%E9%A2%98/"/>
+      <url>/2023/12/03/Canvas%E8%AE%BE%E7%BD%AE%E4%B8%BAWorldSpace%E6%97%B6%EF%BC%8CUI%E4%BA%8B%E4%BB%B6%E4%B8%AD%E9%BC%A0%E6%A0%87%E4%BD%8D%E7%BD%AE%E4%BF%A1%E6%81%AF%E5%81%8F%E7%A7%BB%E7%9A%84%E9%97%AE%E9%A2%98/</url>
+      
+        <content type="html"><![CDATA[<p>需求描述：在Canvas下使用RenderTexture渲染三维场景，同时需要三维场景中需要响应鼠标事件点击，移入，移出等</p><p>解决方案：重写RawImage作为RenderTexture载体，实现鼠标事件接口</p><p>using UnityEngine.EventSystems;<br>using UnityEngine.UI;</p><p>public class RawImageEx : RawImage,IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler<br>{<br>    public void OnPointerClick(PointerEventData eventData)<br>    {<br>        RenderTextureEventTransfor.Instance.BroadCast(this.name, RenderTextureEventTransfor.EventType.Click,this.rectTransform, eventData);<br>    }</p><pre><code>public void OnPointerEnter(PointerEventData eventData)&#123;    RenderTextureEventTransfor.Instance.BroadCast(this.name, RenderTextureEventTransfor.EventType.Enter, this.rectTransform, eventData);&#125;public void OnPointerExit(PointerEventData eventData)&#123;    RenderTextureEventTransfor.Instance.BroadCast(this.name, RenderTextureEventTransfor.EventType.Exit, this.rectTransform, eventData);&#125;</code></pre><p>}<br>上面代码中的RenderTextureEventTransfor是个单例，用来管理事件，里面只有注册，广播两个方法</p><p>using System.Collections;<br>using System.Collections.Generic;<br>using UnityEngine;<br>using UnityEngine.EventSystems;<br>using UnityEngine.UI;<br>public class RenderTextureEventTransfor : SingletonMono<RenderTextureEventTransfor><br>{<br>    public enum EventType<br>    {<br>        Click,<br>        Enter,<br>        Exit<br>    }<br>    private Dictionary&lt;string, Action&lt;RectTransform,PointerEventData&gt;&gt; rtClick &#x3D; new Dictionary&lt;string, Action&lt;RectTransform,PointerEventData&gt;&gt;();<br>    private Dictionary&lt;string, Action&lt;RectTransform,PointerEventData&gt;&gt; rtEnter &#x3D; new Dictionary&lt;string, Action&lt;RectTransform,PointerEventData&gt;&gt;();<br>    private Dictionary&lt;string, Action&lt;RectTransform,PointerEventData&gt;&gt; rtExit &#x3D; new Dictionary&lt;string, Action&lt;RectTransform,PointerEventData&gt;&gt;();</p><pre><code>public void Register(string rtName, EventType eventType, Action&lt;RectTransform, PointerEventData&gt; callBack)&#123;    switch (eventType)    &#123;        case EventType.Click:            if (!rtClick.ContainsKey(rtName))            &#123;                rtClick.Add(rtName, callBack);            &#125;            else            &#123;                rtClick[rtName] += callBack;            &#125;            break;        case EventType.Enter:            if (!rtEnter.ContainsKey(rtName))            &#123;                rtEnter.Add(rtName, callBack);            &#125;            else            &#123;                rtEnter[rtName] += callBack;            &#125;            break;        case EventType.Exit:            if (!rtExit.ContainsKey(rtName))            &#123;                rtExit.Add(rtName, callBack);            &#125;            else            &#123;                rtExit[rtName] += callBack;            &#125;            break;        default:            break;    &#125;&#125;public void BroadCast(string rtName, EventType eventType,RectTransform rtRect, PointerEventData data)&#123;    switch (eventType)    &#123;        case EventType.Click:            foreach (var item in rtClick)            &#123;                if (item.Key == rtName)                    item.Value?.Invoke(rtRect,data);            &#125;            break;        case EventType.Enter:            foreach (var item in rtEnter)            &#123;                if (item.Key == rtName)                    item.Value?.Invoke(rtRect,data);            &#125;            break;        case EventType.Exit:            foreach (var item in rtExit)            &#123;                if (item.Key == rtName)                    item.Value?.Invoke(rtRect,data);            &#125;            break;        default:            break;    &#125;&#125;</code></pre><p>}<br>需要接收触发事件的地方先进行注册，然后再回调中处理逻辑</p><pre><code>void Awake()&#123;    RenderTextureEventTransfor.Instance.Register(rtName, RenderTextureEventTransfor.EventType.Click, OnTriggerMouseClick);    RenderTextureEventTransfor.Instance.Register(rtName, RenderTextureEventTransfor.EventType.Exit, OnTriggerMouseExit);&#125;</code></pre><p>最后在回调中根据传过来的点击事件信息，对鼠标信息做坐标系转换：</p><pre><code>private void OnTriggerMouseClick(RectTransform rtRect, PointerEventData data)&#123;    if(RectTransformUtility.ScreenPointToLocalPointInRectangle(rtRect, data.position, Camera.main,out Vector2 pos))    &#123;        //此处需要根据rtRect的锚点来做对应的偏移        pos += (rtRect.rect.size / 2);        var rate = pos / (rtRect.rect.size);        Ray ray = cam.ViewportPointToRay(rate);        RaycastHit raycastHit;        if (Physics.Raycast(ray, out raycastHit))        &#123;            Debug.DrawLine(ray.origin, raycastHit.point, Color.cyan);            GameObject go = raycastHit.transform.gameObject;        &#125;    &#125;&#125;</code></pre><p>注意：使用RectTransformUtility.ScreenPointToLocalPointInRectangle(rtRect, data.position, Camera.main,out Vector2 pos)接口做屏幕到rtRect的坐标系转换，其中相机为Canvas的渲染相机，得到的pos是相对rtRect的左下角的位置，如果rtRect的锚点在中心，需要加上其大小的一半，以此类推；使用RenderTexture的渲染相机根据得到的位置来做射线检测：Ray ray &#x3D; cam.ViewportPointToRay(rate)。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity踩坑日记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Unity </tag>
+            
+            <tag> 射线检测 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Unity加载StreamAssets图片时失真</title>
+      <link href="/2023/12/03/Unity%E5%8A%A0%E8%BD%BDStreamAssets%E5%9B%BE%E7%89%87%E6%97%B6%E5%A4%B1%E7%9C%9F/"/>
+      <url>/2023/12/03/Unity%E5%8A%A0%E8%BD%BDStreamAssets%E5%9B%BE%E7%89%87%E6%97%B6%E5%A4%B1%E7%9C%9F/</url>
+      
+        <content type="html"><![CDATA[<p>在使用Unity加载外部图片时</p><p>可使用WWW或者时IO的方式</p><p>本例使用IO加载StreamAssets下图片</p><p>但在编辑器测试正确</p><p>发布之后出现图片失真情况，且在不同的显示器（或者是显卡）下，效果不同</p><p>有的失真，有的没有</p><p>使用RenderDoc GPU分析工具</p><p>查看发现，动态加载的图片实际上生成了多个分辨率的贴图，但无最大分辨率为原图的一半，导致图片失真</p><p>解决办法：</p><p>在创建Texture时将其mipChain属性置为false即可</p><p>还可以减少内存的消耗</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity踩坑日记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Unity </tag>
+            
+            <tag> 资源加载 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Unity WebGL中使用Postprocess</title>
+      <link href="/2023/11/29/Unity-WebGL/"/>
+      <url>/2023/11/29/Unity-WebGL/</url>
+      
+        <content type="html"><![CDATA[<p>在Unity WebGL中使用Postproess<br>首先，webgl版本需要在2.0及以上（unity官方公告，2.0之前不支持Post）</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity踩坑日记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Unity </tag>
+            
+            <tag> 技术 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hello World</title>
+      <link href="/2023/11/29/hello-world/"/>
+      <url>/2023/11/29/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+</search>
